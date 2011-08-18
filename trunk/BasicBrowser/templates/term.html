@@ -1,0 +1,80 @@
+<html>
+<head>
+    <script language="JavaScript" src="http://code.jquery.com/jquery-1.4.4.js"></script>
+    <script language="JavaScript" src="/static/js/jquery.rightClick.js"></script>
+    <script language="JavaScript" src="/static/js/browser_adjust.js"></script>
+    <script type="text/JavaScript"> 
+    <!--
+    function init() {
+        browser_adjust();
+    }
+    //-->
+    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<title>{{ term.title }}</title>
+<link href="/static/css/styling.css" rel="stylesheet" type="text/css">
+
+</head>
+  <body onload="init()">
+{{ nav_bar|safe }}
+<div id="top"></div>
+<h1 id="header">
+<table><tr>
+<td id="title">{{ term.title }}</td>
+</tr></table></span>
+<hr noshade>
+</h1>
+
+<div id="main">
+<table><tr>
+
+<td width="65.0%">
+<table class="light">
+<tr class="title">
+<td>document</td>
+</tr>
+{% if docs %}
+	{% for doc in docs %}
+	<tr class="list"><td id="{{ doc.title }}" onclick="window.location.href='/doc/{{ doc.id }}'">{{ doc.title }}</td></tr>
+	{% endfor %}
+{% endif %}
+</table>
+
+</td>
+<td width="15.0%">
+<table class="light_unclickable">
+<tr class="title">
+<td>term count</td>
+</tr>
+{% if counts %}
+	{% for count in counts %}
+	<tr class="list"><td>{{ count|floatformat }}</td></tr>
+	{% endfor %}
+{% endif %}
+</table>
+</td>
+
+<td width="20.0%">
+<table class="light_unclickable">
+<tr class="title">
+<td>term presence</td>
+</tr>
+{% if proportions %}
+	{% for prop in proportions %}
+	<tr class="list"><td>{{ prop|floatformat:3 }}%</td></tr>
+	{% endfor %}
+{% endif %}
+</table>
+</td>
+
+</tr></table>
+</div>
+
+<div id="footer">
+<br>
+<hr noshade>
+</div>
+  </body>
+</html>
+

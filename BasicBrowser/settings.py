@@ -12,7 +12,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/Users/ajb/Desktop/online-tmve-copy/BasicBrowser/tmv_db', # path to database file for sqlite3.
+        'NAME': '<PATH TO SRC DIR>/BasicBrowser/tmv_db', # path to database file for sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.

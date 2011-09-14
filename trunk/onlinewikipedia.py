@@ -51,6 +51,7 @@ def main():
     W = len(vocab)
     
     # Add terms and topics to the DB
+    db.init()
     db.add_terms(vocab)
     db.add_topics(K)
     
@@ -89,8 +90,9 @@ def main():
         
         doc_topic_array = []
         for d in range(len(gamma)):
+            doc_size = len(docset[d])
             for k in range(len(gamma[d])):
-                doc_topic_array.append((doc_ids[d], k, gamma[d][k]))
+                doc_topic_array.append((doc_ids[d], k, gamma[d][k], gamma[d][k]/doc_size))
         db.add_doc_topics(doc_topic_array)
 
         perwordbound = bound * len(docset) / (D * sum(map(sum, wordcts)))

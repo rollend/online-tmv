@@ -1,7 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.template import Template, Context
+from django.template import Template, Context, RequestContext
 from tmv_app.models import *
 from django.db.models import Q
+from django.shortcuts import *
+from django.forms import ModelForm
 import random, sys, datetime
 
 # the following line will need to be updated to launch the browser on a web server
@@ -171,6 +173,37 @@ def stats(request):
     stats_page_context = Context({'nav_bar': nav_bar, 'num_docs': Doc.objects.count(), 'num_topics': Topic.objects.count(), 'num_terms': Term.objects.count(), 'start_time': RunStats.objects.get(id=1).start, 'elapsed_time': (datetime.datetime.now() - RunStats.objects.get(id=1).start), 'num_batches': RunStats.objects.get(id=1).batch_count, 'last_update': RunStats.objects.get(id=1).last_update})
 
     return HttpResponse(stats_template.render(stats_page_context))
+
+class SettingsForm(ModelForm):
+    class Meta:
+        model = Settings
+
+def settings(request):
+    template_file = open(TEMPLATE_DIR + 'settings.html', 'r')
+    settings_template = Template(template_file.read())
+   
+    nav_bar = open(TEMPLATE_DIR + 'nav_bar.html', 'r').read()
+   
+    settings_page_context = Context({'nav_bar': nav_bar, 'settings': Settings.objects.get(id=1)})
+
+    #return HttpResponse(settings_template.render(settings_page_context))
+    return render_to_response('settings.html', settings_page_context, context_instance=RequestContext(request))
+
+def apply_settings(request):
+    settings = Settings.objects.get(id=1)
+    print settings.doc_topic_score_threshold
+    print settings.doc_topic_scaled_score
+    form = SettingsForm(request.POST, instance=settings)
+    print form
+    print settings
+    #TODO: add checks to make sure float will fly!
+    #settings.doc_topic_score_threshold = float(request.POST['threshold'])
+   
+    print settings.doc_topic_score_threshold
+    print settings.doc_topic_scaled_score
+    settings.save()
+
+    return HttpResponseRedirect('/topic_list')
 
 def topic_random(request):
     return HttpResponseRedirect('/topic/' + str(random.randint(1, Topic.objects.count())))

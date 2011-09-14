@@ -42,6 +42,8 @@ INCLUDED FILES
         for details)
 * onlinewikipedia.py: a modified version of the Python script that comes
     with Online LDA
+* onlinewikipedia_restart.py: a modified version of the Python script that
+    comes with Online LDA, used to restart a run from a specified lambda file
 * onlinewikipedia_updates.diff: a diff of the modifications to the original
     python script: the changes connect the demo with the browser database
 * Readme.txt: This file.

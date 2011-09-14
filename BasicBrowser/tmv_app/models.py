@@ -25,6 +25,7 @@ class DocTopic(models.Model):
     doc = models.IntegerField()
     topic = models.IntegerField()
     score = models.FloatField()
+    scaled_score = models.FloatField()
 
 class DocTerm(models.Model):
     doc = models.IntegerField()

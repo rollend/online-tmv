@@ -160,10 +160,10 @@ def update_topic_titles():
         topic.save()
     DB_LOCK.release()
 
-def add_doc_topic(doc_id, topic_id, score):
+def add_doc_topic(doc_id, topic_id, score, scaled_score):
     if score < 1:
         return
-    dt = DocTopic(doc=doc_id, topic=(topic_id+1), score=score)
+    dt = DocTopic(doc=doc_id, topic=(topic_id+1), score=score, scaled_score=scaled_score)
     dt.save()
 
 def add_doc_topics(doc_topic_array):
@@ -175,7 +175,7 @@ class DocTopicsTask(DBTask):
         DBTask.__init__(self, "write doc topics")
     def db_write(self):
         for dt in self.doc_topics:
-            add_doc_topic(dt[0], dt[1], dt[2])
+            add_doc_topic(dt[0], dt[1], dt[2], dt[3])
 
 def add_doc_term(doc, term, score):
     if score > 0:

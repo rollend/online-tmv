@@ -85,11 +85,16 @@ def doc_detail(request, doc_id):
 
     topics = []
     pie_array = []
+    dt_threshold = Settings.objects.get(id=1).doc_topic_score_threshold
+    dt_thresh_scaled = Settings.objects.get(id=1).doc_topic_scaled_score
     for dt in doctopics:
-        if (dt.score >= 10):
+        if ((not dt_thresh_scaled and dt.score >= dt_threshold) or (dt_thresh_scaled and dt.scaled_score*100 >= dt_threshold)):
             topic = Topic.objects.get(pk=dt.topic)
             topics.append(topic)
-            pie_array.append([dt.score, '/topic/' + str(topic.id), 'topic_' + str(topic.id)])
+            if not dt_thresh_scaled:
+                pie_array.append([dt.score, '/topic/' + str(topic.id), 'topic_' + str(topic.id)])
+            else:
+                pie_array.append([dt.scaled_score, '/topic/' + str(topic.id), 'topic_' + str(topic.id)])
     
     nav_bar = open(TEMPLATE_DIR + 'nav_bar.html', 'r').read()
     

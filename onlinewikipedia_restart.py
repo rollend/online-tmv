@@ -24,7 +24,7 @@ import onlineldavb
 import wikirandom
 
 # import file for easy access to browser database
-sys.path.append('/Users/ajbc/Projects/lifelong_olda/online-tmv/BasicBrowser/')
+sys.path.append('<ABSOLUTE PATH TO SRC DIR>/BasicBrowser/')
 import db
 
 def main():
@@ -89,8 +89,9 @@ def main():
         
         doc_topic_array = []
         for d in range(len(gamma)):
+            doc_size = len(docset[d])
             for k in range(len(gamma[d])):
-                doc_topic_array.append((doc_ids[d], k, gamma[d][k]))
+                doc_topic_array.append((doc_ids[d], k, gamma[d][k], gamma[d][k]/doc_size))
         db.add_doc_topics(doc_topic_array)
 
         perwordbound = bound * len(docset) / (D * sum(map(sum, wordcts)))

@@ -7,8 +7,12 @@ import threading, datetime
 
 from tmv_app.models import *
 
-stats = RunStats(start=datetime.datetime.now(), batch_count=0, last_update=datetime.datetime.now())
-stats.save()
+def init():
+    stats = RunStats(start=datetime.datetime.now(), batch_count=0, last_update=datetime.datetime.now())
+    stats.save()
+    
+    settings = Settings(doc_topic_score_threshold=10, doc_topic_scaled_score=True)
+    settings.save()
 
 class DBManager(threading.Thread):
     def __init__(self):

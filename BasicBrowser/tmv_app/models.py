@@ -35,3 +35,7 @@ class RunStats(models.Model):
     start = models.DateTimeField()
     batch_count = models.IntegerField()
     last_update = models.DateTimeField()
+
+class Settings(models.Model):
+    doc_topic_score_threshold = models.FloatField()
+    doc_topic_scaled_score = models.BooleanField()

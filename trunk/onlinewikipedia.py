@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
 # onlinewikipedia.py: Demonstrates the use of online VB for LDA to
 # analyze a bunch of random Wikipedia articles.
@@ -82,12 +82,6 @@ def main():
         # Since writes take so long, this also balaces the two threads time-wise.
         doc_ids = db.add_docs(doc_array)
 	
-        for d in range(len(articlenames)):        
-            for term in range(len(wordids[d])):
-                doc_term_array.append((doc_ids[d], wordids[d][term], wordcts[d][term]))
-        
-        db.add_doc_terms(doc_term_array)
-        
         doc_topic_array = []
         for d in range(len(gamma)):
             doc_size = len(docset[d])
@@ -115,7 +109,6 @@ def main():
                     topic_terms_array.append((topic, term, olda._lambda[topic][term]/lambda_sum))
             db.update_topic_terms(K, topic_terms_array)
                 
-            db.update_topic_titles()
             gc.collect() # probably not necesary, but precautionary for long runs
             db.print_task_update()
         db.increment_batch_count()

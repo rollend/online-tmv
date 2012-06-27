@@ -2,7 +2,6 @@
 <head>
     <script language="JavaScript" src="http://code.jquery.com/jquery-1.4.4.js"></script>
     <script language="JavaScript" src="/static/js/pie.js"></script>
-    <script language="JavaScript" src="/static/js/browser_adjust.js"></script>
     <script language="JavaScript" src="/static/js/search.js"></script>
 
 
@@ -13,8 +12,6 @@
     var elements = generate_pie_elements(array);
     var piec = null;
     function init() {
-        browser_adjust();
-        
         // create pie chart
         piec = new PieChart(elements);
         piec.initialize();
@@ -71,7 +68,7 @@
                 <table class="light">
                 <tr class="doc"><td>
                     <p>
-			            {{ doc.content }}
+			            {{ doc.content|safe }}
 		            </p>
 		            <p><a href="http://en.wikipedia.org/wiki/{{ doc.title }}">Full article&nbsp;&#x25B8;</a></p>
                 </td></tr>
@@ -84,5 +81,6 @@
         <br>
         <hr noshade>
     </div>
+<p align=center>The contents of the Wikipedia articles are released under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>.</p>
 </body>
 </html>

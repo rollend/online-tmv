@@ -2,19 +2,7 @@
 <head>
     <script language="JavaScript" src="http://code.jquery.com/jquery-1.4.4.js"></script>
     <script language="JavaScript" src="/static/js/pie.js"></script>
-    <script language="JavaScript" src="/static/js/browser_adjust.js"></script>
     <script language="JavaScript" src="/static/js/search.js"></script>
-
-
-    <script type="text/JavaScript">
-    <!--
-
-    function init() {
-        browser_adjust();
-    }
-
-    //-->
-    </script>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     
@@ -23,7 +11,7 @@
     <link href="/static/css/styling.css" rel="stylesheet" type="text/css">
 </head>
 
-<body onLoad="init()">
+<body>
 {{ nav_bar|safe }}
 
     <div id="top"></div>
@@ -39,7 +27,7 @@
     <div id="main">
         <table>
             <tr><td width="210px">
-            <br>Model has been running since {{ start_time }}, or for {{ start_time|timesince }}.
+            Model started running at {{ start_time }}, and has run {{ start_time|timesince:last_update }}.
             <br>Last update at {{ last_update }}, or {{ last_update|timesince}} ago.
             <br>{{ num_batches }} Batches Completed
             <br>{{ num_docs }} Documents

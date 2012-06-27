@@ -7,13 +7,6 @@ import threading, datetime
 
 from tmv_app.models import *
 
-def init():
-    stats = RunStats(start=datetime.datetime.now(), batch_count=0, last_update=datetime.datetime.now())
-    stats.save()
-    
-    settings = Settings(doc_topic_score_threshold=10, doc_topic_scaled_score=True)
-    settings.save()
-
 class DBManager(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -44,6 +37,30 @@ class DBManager(threading.Thread):
                     except:
                         self.tasks.insert(0, self.current)
 
+DB_LOCK = threading.Lock()
+DBM = DBManager()
+DBM.start()
+
+def init():
+    stats = RunStats(start=datetime.datetime.now(), batch_count=0, last_update=datetime.datetime.now())
+    stats.save()
+    
+    settings = Settings(doc_topic_score_threshold=1, doc_topic_scaled_score=True)
+    settings.save()
+
+def signal_end():
+    DBM.end = True
+
+def increment_batch_count():
+    DB_LOCK.acquire()
+    stats = RunStats.objects.get(id=1)
+    stats.batch_count += 1
+    stats.last_update = datetime.datetime.now()
+    stats.topic_titles_current = False
+    print stats.last_update
+    stats.save()
+    DB_LOCK.release()
+
 def print_task_update():
     print "** CURRENT TASKS **"
     tasks = DBM.tasks[:]
@@ -54,22 +71,6 @@ def print_task_update():
         canceled = task.cancel
         print "   %s %s\t\t%s\t\t%s" % (task.time_created, task.name, canceled, active)
     print "** END **"
-
-DB_LOCK = threading.Lock()
-DBM = DBManager()
-DBM.start()
-
-def signal_end():
-    DBM.end = True
-
-def increment_batch_count():
-    DB_LOCK.acquire()
-    stats = RunStats.objects.get(id=1)
-    stats.batch_count += 1
-    stats.last_update = datetime.datetime.now()
-    print stats.last_update
-    stats.save()
-    DB_LOCK.release()
 
 class DBTask():
     def __init__(self, name):
@@ -91,12 +92,10 @@ class DBTask():
     def db_write(self):
         pass
 
+
 def add_term(title):
     term = Term(title=title)
     term.save()
-
-def add_terms(terms):
-    DBM.add(TermsTask(terms))
 
 class TermsTask(DBTask):
     def __init__(self, terms):
@@ -106,12 +105,13 @@ class TermsTask(DBTask):
         for t in self.terms:
             add_term(t.strip())
 
+def add_terms(terms):
+    DBM.add(TermsTask(terms))
+
+
 def add_topic(title):
     topic = Topic(title=title)
     topic.save()
-
-def add_topics(no_topics):
-    DBM.add(TopicsTask(no_topics))
 
 class TopicsTask(DBTask):
     def __init__(self, no_topics):
@@ -121,9 +121,13 @@ class TopicsTask(DBTask):
         for t in range(self.no_topics):
             add_topic("Topic " + str(t+1))
 
+def add_topics(no_topics):
+    DBM.add(TopicsTask(no_topics))
+
+
 def add_doc(title, content):
     DB_LOCK.acquire()
-    doc = Doc(title=urllib2.unquote(title), content=content)
+    doc = Doc(title=urllib2.unquote(title), content="")
     doc.save()
     DB_LOCK.release()
     return doc.id
@@ -132,11 +136,30 @@ def add_docs(doc_array):
     doc_ids = []
     DB_LOCK.acquire()
     for d in doc_array:
-        doc = Doc(title=urllib2.unquote(d[0]), content=d[1])
+        doc = Doc(title=urllib2.unquote(d[0]), content="")
 	doc.save()
         doc_ids.append(doc.id)
     DB_LOCK.release()
     return doc_ids
+
+
+def add_doc_topic(doc_id, topic_id, score, scaled_score):
+    if score < 1:
+        return
+    dt = DocTopic(doc=doc_id, topic=(topic_id+1), score=score, scaled_score=scaled_score)
+    dt.save()
+
+class DocTopicsTask(DBTask):
+    def __init__(self, doc_topics):
+        self.doc_topics = doc_topics
+        DBTask.__init__(self, "write doc topics")
+    def db_write(self):
+        for dt in self.doc_topics:
+            add_doc_topic(dt[0], dt[1], dt[2], dt[3])
+
+def add_doc_topics(doc_topic_array):
+    DBM.add(DocTopicsTask(doc_topic_array))
+
 
 def clear_topic_terms(topic):
     try:
@@ -149,60 +172,6 @@ def add_topic_term(topic, term, score):
         tt = TopicTerm(topic=(topic+1), term=(term+1), score=score)
         tt.save()
 
-def update_topic_titles():
-    DB_LOCK.acquire()
-    for topic in Topic.objects.all():
-        topicterms = TopicTerm.objects.filter(topic=topic.id).order_by('-score')[:3]
-        if topicterms.count() < 3:
-            continue
-        new_topic_title = '{' + Term.objects.get(pk=topicterms[0].term).title + ', ' + Term.objects.get(pk=topicterms[1].term).title + ', ' + Term.objects.get(pk=topicterms[2].term).title + '}'#TODO: pretty this up?
-        topic.title = new_topic_title
-        topic.save()
-    DB_LOCK.release()
-
-def add_doc_topic(doc_id, topic_id, score, scaled_score):
-    if score < 1:
-        return
-    dt = DocTopic(doc=doc_id, topic=(topic_id+1), score=score, scaled_score=scaled_score)
-    dt.save()
-
-def add_doc_topics(doc_topic_array):
-    DBM.add(DocTopicsTask(doc_topic_array))
-
-class DocTopicsTask(DBTask):
-    def __init__(self, doc_topics):
-        self.doc_topics = doc_topics
-        DBTask.__init__(self, "write doc topics")
-    def db_write(self):
-        for dt in self.doc_topics:
-            add_doc_topic(dt[0], dt[1], dt[2], dt[3])
-
-def add_doc_term(doc, term, score):
-    if score > 0:
-        #print (doc, term+1, score)
-        dt = DocTerm(doc=doc, term=(term+1), score=score)
-        #print dt
-        dt.save()
-
-def add_doc_terms(doc_term_array):
-    DBM.add(DocTermsTask(doc_term_array))
-
-class DocTermsTask(DBTask):
-    def __init__(self, doc_terms):
-        self.doc_terms = doc_terms
-        DBTask.__init__(self, "write doc terms")
-    def db_write(self):
-        for dt in self.doc_terms:
-            add_doc_term(dt[0], dt[1], dt[2])
-
-def update_topic_terms(no_topics, topic_terms):
-    for task in DBM.tasks:
-        if isinstance(task, UpdateTopicTermsTask):
-            task.safe_cancel()
-            DBM.cancel_task(task)
-
-    DBM.add_start(UpdateTopicTermsTask(no_topics, topic_terms))
-
 class UpdateTopicTermsTask(DBTask):
     def __init__(self, no_topics, topic_terms):
         self.no_topics = no_topics
@@ -213,4 +182,11 @@ class UpdateTopicTermsTask(DBTask):
             clear_topic_terms(topic)
         for tt in self.topic_terms:
             add_topic_term(tt[0], tt[1], tt[2])
-    
+
+def update_topic_terms(no_topics, topic_terms):
+    for task in DBM.tasks:
+        if isinstance(task, UpdateTopicTermsTask):
+            task.safe_cancel()
+            DBM.cancel_task(task)
+
+    DBM.add_start(UpdateTopicTermsTask(no_topics, topic_terms))

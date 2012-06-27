@@ -41,11 +41,7 @@ INCLUDED FILES
     * all other .py files that come standard with Django (see Django doc 
         for details)
 * onlinewikipedia.py: a modified version of the Python script that comes
-    with Online LDA
-* onlinewikipedia_restart.py: a modified version of the Python script that
-    comes with Online LDA, used to restart a run from a specified lambda file
-* onlinewikipedia_updates.diff: a diff of the modifications to the original
-    python script: the changes connect the demo with the browser database
+    with Online LDA (see below for source)
 * Readme.txt: This file.
 * COPYING: A copy of the GNU public license version 3.
 
@@ -87,9 +83,9 @@ To view the browser, run the following in the BasicBrowser directory:
     python manage.py runserver
 
 and navigate to the following link in a web browser, reloading as desired.
-(The topics make take a while to be created and populated with term.)
+(The topics make take a while to be created and populated with terms.)
 
-    http://127.0.0.1:8000/topic_list
+    http://127.0.0.1:8000/topic_presence
 
 Viewing a given page of the browser make take longer while the topic model
 is running than it does after the run completes.

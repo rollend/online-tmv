@@ -41,11 +41,7 @@ INCLUDED FILES
     * all other .py files that come standard with Django (see Django doc 
         for details)
  * onlinewikipedia.py: a modified version of the Python script that comes
-    with Online LDA
- * onlinewikipedia_restart.py: a modified version of the Python script that
-    comes with Online LDA, used to restart a run from a specified lambda file
- * onlinewikipedia_updates.diff: a diff of the modifications to the original
-    python script: the changes connect the demo with the browser database
+    with Online LDA (see below for source)
  * Readme.txt: This file.
  * COPYING: A copy of the GNU public license version 3.
 

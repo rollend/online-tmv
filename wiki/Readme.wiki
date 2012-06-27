@@ -85,7 +85,7 @@ To view the browser, run the following in the BasicBrowser directory:
 and navigate to the following link in a web browser, reloading as desired.
 (The topics make take a while to be created and populated with term.)
 
-    http://127.0.0.1:8000/topic_list
+    http://127.0.0.1:8000/topic_presence
 
 Viewing a given page of the browser make take longer while the topic model
 is running than it does after the run completes.
